@@ -48,7 +48,11 @@ int main(void) {
 	 */
 	size_t totalTransactions = sizeof(input) / INPUT_LENGHT;
 	struct data transaction[100];	//a max of 100 transactions can be sent by the buffer
+
+	//parseInput read the data provided from the address and store it in structs
 	parseInput(input, transaction, totalTransactions);
+
+	//reArrange sorts the structs using bubble sorting
 	reArrange(transaction, totalTransactions);
 	return 0;
 }//end main
@@ -80,6 +84,16 @@ int parseInput(const char *input, struct data *transaction, size_t totalTransact
 //char * strptime (const char *s, const char *fmt, struct tm *tp)
 
 int reArrange (struct data *transaction, size_t totalTransactions){
+	struct data sortingTransaction;		//temporal struct to sort the transactions
+	for (int passes = 0; passes < totalTransactions -1; passes++){
+		for (int comp = 0; comp < totalTransactions - passes -1; comp++){
+			if (transaction[comp].timestamp > transaction[comp+1].timestamp){
+				sortingTransaction = transaction[comp];
+				transaction[comp] = transaction[comp+1];
+				transaction[comp+1] = sortingTransaction;
+			}//end if
+		}//end internal loop
+	}//end external loop
 
 	return 0;
 }
