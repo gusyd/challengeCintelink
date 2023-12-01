@@ -22,6 +22,15 @@ const char data[] = {
 		0x30, 0x38, 0x2F, 0x30, 0x33, 0x2F, 0x32, 0x30, 0x32, 0x33, 0x20, 0x30, 0x38, 0x3A, 0x31, 0x30, 0x3A, 0x34, 0x30, 0x46, 0x4D, 0x5A, 0x20, 0x35, 0x37, 0x31, 0x32, 0x44, 0x20, 0xA1, 0x07, 0x00, 0x35, 0x82,
 		0x30, 0x34, 0x2F, 0x31, 0x34, 0x2F, 0x32, 0x30, 0x32, 0x33, 0x20, 0x31, 0x30, 0x3A, 0x32, 0x30, 0x3A, 0x31, 0x32, 0x4D, 0x46, 0x4B, 0x20, 0x33, 0x31, 0x35, 0x37, 0x53, 0xA0, 0x0F, 0x00, 0x00, 0x9C, 0xAD
 };
+
+/*The data is:
+ * Timestamp		Veh		Product	Milliliter	Trans ID
+10/23/2023 14:02:00	UJC 3171	Q	00000055	11111
+04/14/2023 10:11:12	MFK 3157	S	00004000	22222
+08/03/2023 08:10:40	FMZ 5712	D	00500000	33333
+04/14/2023 10:20:12	MFK 3157	S	00004000	44444
+ */
+
 char log[700] = {0}; //max 100 transactions of 70 bytes each.
 //To parse the input data, a struct is defined (with the output format as a reminder):
 struct transaction {
@@ -38,7 +47,7 @@ struct transaction transactions[100];	//a max of 100 transactions can be sent by
  * Me resulto mas intuitivo desarrollar una funcion para cada accion necesaria,
  * por lo que no termine usando log_transactions(), pero dejo el prototipo declarado.
  * El programa fue probado y funciona con 4 registros.
- * Los comentarios fueron escritos en ingles.
+ * Elr esto de los comentarios son en ingles.
  */
 int log_transactions(const char *data, char *log, size_t transaction_count);
 int parseInput(const char *data, struct transaction *transactions, size_t totalTransactions);
@@ -73,7 +82,7 @@ int main(void) {
 
 
 int parseInput(const char *data, struct transaction *transactions, size_t totalTransactions){
-	struct tm timestampInput;
+	struct tm timestampInput = {0};		//Initialized empty to avoid issues on timestamp
 	for(int i=0; i < totalTransactions; i++) {
 		//Extracting the timestamp:
 		char timestampConversion[20] = {0};	//char array to store the POSIX timestamp temporally
@@ -111,7 +120,7 @@ int saveToBuffer (struct transaction *transactions, size_t totalTransactions, ch
 	int writtenBytes = 0;		//Used to store the number of bytes written returned by the function sprintf
 	for(int i = 0; i < totalTransactions; i++){
 		//To convert to the format required, I must take the POSIX time and convert to a struct tm.
-		struct tm fullDateTime = {0}; //iniciallyze an empty struct to avoid conflicts.
+		struct tm fullDateTime = {0}; //initialize an empty struct to avoid conflicts.
 		gmtime_r(&transactions[i].timestamp, &fullDateTime);
 		char formattedDateTime[18] = {0}; //For the output I use yy instead of YYYY
 		strftime(&formattedDateTime, 18, "%d/%m/%y %T", &fullDateTime);
